@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	
 	// remember to replace "YourStudentID" with your own student ID
-	glutCreateWindow("CG_HW2_YourStudentID");
+	glutCreateWindow("CG_HW2_0756623");
 	glutReshapeWindow(512, 512);
 
 	glewInit();

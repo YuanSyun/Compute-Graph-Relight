@@ -1,0 +1,172 @@
+﻿  glm.c
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(265): error C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\string.h(133): note: 請參閱 'strcpy' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(266): error C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\string.h(90): note: 請參閱 'strcat' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(343): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(344): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(345): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(347): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(348): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(349): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(303): error C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\string.h(133): note: 請參閱 'strcpy' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(304): error C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\string.h(90): note: 請參閱 'strcat' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(306): error C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(208): note: 請參閱 'fopen' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(314): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(325): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(2263): note: 請參閱 'sscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(361): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(385): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(2263): note: 請參閱 'sscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(392): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(413): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(419): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(425): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(442): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(461): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(514): error C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\string.h(133): note: 請參閱 'strcpy' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(515): error C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\string.h(90): note: 請參閱 'strcat' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(519): error C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(208): note: 請參閱 'fopen' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(573): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(605): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(2263): note: 請參閱 'sscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(627): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(631): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(2263): note: 請參閱 'sscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(632): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(633): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(636): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(640): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(2263): note: 請參閱 'sscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(642): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(643): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(646): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(650): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(2263): note: 請參閱 'sscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(652): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(653): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(656): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(662): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(663): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(666): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(667): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(668): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(729): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(738): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(745): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(752): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(761): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(2263): note: 請參閱 'sscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(791): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(795): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(2263): note: 請參閱 'sscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(799): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(803): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(809): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(825): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(2263): note: 請參閱 'sscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(830): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(834): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(840): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(856): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(2263): note: 請參閱 'sscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(861): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(865): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(871): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(889): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(2263): note: 請參閱 'sscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(893): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(897): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(903): error C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(1197): note: 請參閱 'fscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(988): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(989): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(990): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(993): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1195): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1402): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1408): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1409): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1459): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1460): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1467): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1469): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1472): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1474): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1477): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1478): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1608): warning C4018: '<': signed/unsigned 不相符
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1551): error C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(208): note: 請參閱 'fopen' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1692): error C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(208): note: 請參閱 'fopen' 的宣告
+  glmimg.c
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glmimg.c(143): error C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(208): note: 請參閱 'fopen' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glmimg.c(165): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(2263): note: 請參閱 'sscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glmimg.c(167): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(2263): note: 請參閱 'sscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glmimg.c(169): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\stdio.h(2263): note: 請參閱 'sscanf' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glmimg.c(398): warning C4244: '=': 將 'int' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glmimg.c(399): warning C4244: '=': 將 'int' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+  glmimg_devil.c
+  glmimg_jpg.c
+  glmimg_png.c
+  glmimg_sdl.c
+  glmimg_sim.c
+  glm_util.c
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm_util.c(25): error C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\ucrt\string.h(133): note: 請參閱 'strcpy' 的宣告
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm_util.c(37): warning C4267: '正在初始化': 將 'size_t' 轉換為 'int'，資料可能遺失
+  glm_helper.c
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm_helper.c(17): warning C4018: '<': signed/unsigned 不相符
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm_helper.c(38): warning C4018: '<': signed/unsigned 不相符
+  正在產生程式碼...

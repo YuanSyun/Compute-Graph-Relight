@@ -1,0 +1,39 @@
+﻿  glm.c
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(343): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(344): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(345): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(347): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(348): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(349): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(988): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(989): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(990): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(993): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1195): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1402): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1408): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1409): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1459): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1460): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1467): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1469): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1472): warning C4305: '=': 從 'double' 轉換為 'GLfloat'，是由較大的類型轉換為較小的類型，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1474): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1477): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1478): warning C4244: '=': 將 'double' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glm.c(1608): warning C4018: '<': signed/unsigned 不相符
+  glmimg.c
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glmimg.c(398): warning C4244: '=': 將 'int' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm\glmimg.c(399): warning C4244: '=': 將 'int' 轉換為 'GLfloat'，由於類型不同，可能導致資料遺失
+  glmimg_devil.c
+  glmimg_jpg.c
+  glmimg_png.c
+  glmimg_sdl.c
+  glmimg_sim.c
+  glm_util.c
+  glm_helper.c
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm_helper.c(17): warning C4018: '<': signed/unsigned 不相符
+d:\master2\computer graphics\compute-graph-relight\cg_hw2\glm_helper.c(38): warning C4018: '<': signed/unsigned 不相符
+  正在產生程式碼...
+  main.cpp
+  CG_HW2.vcxproj -> D:\Master2\Computer Graphics\Compute-Graph-Relight\Debug\CG_HW2.exe
