@@ -6,15 +6,18 @@ in VS_OUT {
 	vec3 Normal;
     vec2 TexCoords;
     vec4 FragPosLightSpace;	//光坐標系下的位置
+	vec4 ProjTexCoord;
 } fs_in;
 
 uniform sampler2D diffuseTexture;
 uniform sampler2D shadowMap;
 uniform sampler2D noiseTexture;
+uniform sampler2D ProjectTex;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 uniform float dissolvingThreshold;
 uniform int dissolvingEffects;
+uniform float bias;
 
 float ShadowCalculation(vec4 fragPosLightSpace)
 {
@@ -55,14 +58,15 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 void main()
 {         
-    vec3 color = texture(diffuseTexture, fs_in.TexCoords).rgb;
+    //vec3 color = texture(diffuseTexture, fs_in.TexCoords).rgb;
+	vec3 color = texture(ProjectTex, fs_in.ProjTexCoord.xy/fs_in.ProjTexCoord.w).xyz;
 
     // shadwing
     float shadow = ShadowCalculation(fs_in.FragPosLightSpace);    
 	
-	//vec3 lighting = (1.0 - shadow) * color;
+	vec3 lighting = (1.0 - shadow) * color;
 	//vec3 lighting = shadow * color;
-	vec3 lighting = shadow; 
+	//vec3 lighting = shadow; 
 
 	if(dissolvingEffects==1)
 	{

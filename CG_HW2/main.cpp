@@ -149,7 +149,6 @@ std::vector<glm::vec3> planeNormals;
 // shader 
 GLuint program;
 GLuint program_depth;
-GLuint projective_texture;
 const GLuint  SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
 // window size
@@ -319,7 +318,7 @@ void init(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	GLfloat shaowborderColor[] = { 0.0, 0.0, 0.0, 0.0 };
+	GLfloat shaowborderColor[] = { 1.0, 0.0, 0.0, 0.0 };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, shaowborderColor);
 
 	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
@@ -341,11 +340,6 @@ void init(void)
 	GLuint frag = createShader("Shaders/shadow_mapping.frag", "fragment");
 	program = createProgram(vert, frag);
 	printf("loaded shadow map shader\n");
-
-	GLuint vert_projective = createShader("Shaders/projective_texture.vert", "vertex");
-	GLuint frag_projective = createShader("Shaders/projective_texture.frag", "fragment");
-	projective_texture = createProgram(vert_projective, frag_projective);
-	printf("loaded projective texture shader");
 }
 
 void display(void)
@@ -476,9 +470,24 @@ void display(void)
 	glPopMatrix();
 
 	/*------------------------------------------------------------------------------------------------*/
+	
+	//使用shadow mapping shader
+	glUseProgram(program);
 
-	//使用projective texture shader
-	glUseProgram(projective_texture);
+	//繪製燈光位置
+	glPushMatrix();
+		glMatrixMode(GL_MODELVIEW);
+		glColor3f(1, 1, 1);
+		draw_light_bulb();
+	glPopMatrix();
+
+	//傳入shader屬性
+	glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, &projection[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &viewMatrix[0]);
+	glUniform3fv(glGetUniformLocation(program, "lightPos"), 1, &light_pos[0]);
+	GLfloat cameraPos[3] = { eyex, eyey, eyez };
+	glUniform3fv(glGetUniformLocation(program, "viewPos"), 1, &cameraPos[0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
 
 	/*
 		Setting projective texture shader
@@ -491,123 +500,25 @@ void display(void)
 		0.5f, 0.5f, 0.5f, 1
 	);
 	glm::mat4 projectorMatrix = scaleTrans * projection * matViewMatrix;
-	glUniformMatrix4fv(glGetUniformLocation(projective_texture, "ProjectorMatrix"), 1, GL_FALSE, &projectorMatrix[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(projective_texture, "projection"), 1, GL_FALSE, &projection[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(projective_texture, "view"), 1, GL_FALSE, &matViewMatrix[0][0]);
-
-	/*
-		Loading the proejctive texture for shader
-	*/
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, projTextureID);
-	glUniform1i(glGetUniformLocation(projective_texture, "ProjectTex"), 0);
-
-	/*
-		Loading the projective bias
-	*/
-	glUniform1f(glGetUniformLocation(projective_texture, "bias"), bias);
-
-	//繪製平面
-	glPushMatrix();
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		glTranslatef(plane_pos[0], plane_pos[1], plane_pos[2]);
-		glRotatef(plane_rot[0], 1, 0, 0);
-		glRotatef(plane_rot[1], 0, 1, 0);
-		glRotatef(plane_rot[2], 0, 0, 1);
-		glColor3f(1, 1, 1);
-
-		//取得平面model matrix
-		glGetFloatv(GL_MODELVIEW_MATRIX, now_model_matrix);
-		ModelMatrix = glm::mat4(now_model_matrix[0], now_model_matrix[1], now_model_matrix[2], now_model_matrix[3],
-			now_model_matrix[4], now_model_matrix[5], now_model_matrix[6], now_model_matrix[7],
-			now_model_matrix[8], now_model_matrix[9], now_model_matrix[10], now_model_matrix[11],
-			now_model_matrix[12], now_model_matrix[13], now_model_matrix[14], now_model_matrix[15]);
-		glUniformMatrix4fv(glGetUniformLocation(projective_texture, "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
-
-		//畫出圖形
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, planeVertexBufferId);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, planeNormalBufferId);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, planeUvBufferId);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glDrawArrays(GL_TRIANGLES, 0, planeVertices.size());
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(2);
-		glBindTexture(GL_TEXTURE0, 0);
-
-	//繪製平面結束
-	glPopMatrix();
-
-	//繪製球體
-	glPushMatrix();
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]);
-		glRotatef(ball_rot[0], 1, 0, 0);
-		glRotatef(ball_rot[1], 0, 1, 0);
-		glRotatef(ball_rot[2], 0, 0, 1);
-		glColor3f(1, 1, 1);
-
-		//設定球體model matrix
-		glGetFloatv(GL_MODELVIEW_MATRIX, now_model_matrix);// pass the model matrix
-		ModelMatrix = glm::mat4(now_model_matrix[0], now_model_matrix[1], now_model_matrix[2], now_model_matrix[3],
-			now_model_matrix[4], now_model_matrix[5], now_model_matrix[6], now_model_matrix[7],
-			now_model_matrix[8], now_model_matrix[9], now_model_matrix[10], now_model_matrix[11],
-			now_model_matrix[12], now_model_matrix[13], now_model_matrix[14], now_model_matrix[15]);
-		glUniformMatrix4fv(glGetUniformLocation(projective_texture, "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
-
-		//渲染球體
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, ballVertexBufferId);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, ballNormalBufferId);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, ballUvBufferId);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glDrawArrays(GL_TRIANGLES, 0, ballVertices.size());
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(2);
-		glBindTexture(GL_TEXTURE0, 0);
-
-	//繪製球體結束
-	glPopMatrix();
-
-	//關閉shadow mapping shader
-	glUseProgram(0);
-
-	/*------------------------------------------------------------------------------------------------*/
-	/*
-	//使用shadow mapping shader
-	glUseProgram(program);
-
-	//繪製燈光位置
-	glPushMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glColor3f(1, 1, 1);
-	draw_light_bulb();
-	glPopMatrix();
-
-	//傳入shader屬性
-	glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, &projection[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &viewMatrix[0]);
-	glUniform3fv(glGetUniformLocation(program, "lightPos"), 1, &light_pos[0]);
-	GLfloat cameraPos[3] = { eyex, eyey, eyez };
-	glUniform3fv(glGetUniformLocation(program, "viewPos"), 1, &cameraPos[0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "ProjectorMatrix"), 1, GL_FALSE, &projectorMatrix[0][0]);
 
 	//設定陰影貼圖
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
 	glUniform1i(glGetUniformLocation(program, "shadowMap"), 1);
+
+	/*
+		Loading the proejctive texture for shader
+	*/
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, projTextureID);
+	glUniform1i(glGetUniformLocation(program, "ProjectTex"), 4);
+
+	/*
+		Loading the projective bias
+	*/
+	glUniform1f(glGetUniformLocation(program, "bias"), bias);
+
 
 	//繪製平面
 	glPushMatrix();
@@ -710,7 +621,7 @@ void display(void)
 
 	//關閉shadow mapping shader
 	glUseProgram(0);
-	*/
+	
 	/*------------------------------------------------------------------------------------------------*/
 
 	glutSwapBuffers();
