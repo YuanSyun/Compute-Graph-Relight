@@ -67,7 +67,7 @@ namespace
 	char *floor_tex_dir = "../Resources/WoodFine.ppm";
 	char *plane_file_dir = "../Resources/Plane.obj";
 	char *noise_tex_dir = "../Resources/noise.ppm";
-	char* projective_tex_dir = "../Resources/edgar_payne.ppm";
+	char* projective_tex_dir = "../Resources/test.ppm";
 	
 	GLfloat light_rad = 0.05; //radius of the light bulb
 	float eyet = -5.59; //theta in degree
@@ -209,7 +209,7 @@ void init(void)
 	mainTextureID = loadTexture(main_tex_dir, 1024, 1024);
 	floorTextureID = loadTexture(floor_tex_dir, 1024, 1024);
 	noiseTextureID = loadTexture(noise_tex_dir, 320, 320);
-	projTextureID = loadTexture(projective_tex_dir, 750, 634);
+	projTextureID = loadTexture(projective_tex_dir, 890, 290);
 
 	// create ball vao
 	model = glmReadOBJ(obj_file_dir);
