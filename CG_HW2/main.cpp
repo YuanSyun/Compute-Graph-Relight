@@ -65,9 +65,9 @@ namespace
 	char *obj_file_dir = "../Resources/cube.obj";
 	char *main_tex_dir = "../Resources/Stone.ppm";
 	char *floor_tex_dir = "../Resources/WoodFine.ppm";
-	char *plane_file_dir = "../Resources/Plane.obj";
+	char *plane_file_dir = "../Resources/plane.obj";
 	char *noise_tex_dir = "../Resources/noise.ppm";
-	char* projective_tex_dir = "../Resources/test.ppm";
+	char* projective_tex_dir = "../Resources/test2.ppm";
 	
 	GLfloat light_rad = 0.05; //radius of the light bulb
 	float eyet = -5.59; //theta in degree
@@ -209,7 +209,7 @@ void init(void)
 	mainTextureID = loadTexture(main_tex_dir, 1024, 1024);
 	floorTextureID = loadTexture(floor_tex_dir, 1024, 1024);
 	noiseTextureID = loadTexture(noise_tex_dir, 320, 320);
-	projTextureID = loadTexture(projective_tex_dir, 890, 290);
+	projTextureID = loadTexture(projective_tex_dir, 2000, 1681);
 
 	// create ball vao
 	model = glmReadOBJ(obj_file_dir);
@@ -476,7 +476,7 @@ void display(void)
 
 	//Ã¸»s¿O¥ú¦ì¸m
 	glPushMatrix();
-		glMatrixMode(GL_MODELVIEW);
+		//glMatrixMode(GL_MODELVIEW);
 		glColor3f(1, 1, 1);
 		draw_light_bulb();
 	glPopMatrix();
