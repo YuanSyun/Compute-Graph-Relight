@@ -62,8 +62,7 @@ void print_mat4(char* s, float* m);
 
 namespace
 {
-	char *obj_file_dir = "../Resources/Ball.obj";
-	char *obj_file_dir2 = "../Resources/bunny.obj";
+	char *obj_file_dir = "../Resources/cube.obj";
 	char *main_tex_dir = "../Resources/Stone.ppm";
 	char *floor_tex_dir = "../Resources/WoodFine.ppm";
 	char *plane_file_dir = "../Resources/Plane.obj";
@@ -147,13 +146,6 @@ std::vector<glm::vec3> planeVertices;
 std::vector<glm::vec2> planeUvs;
 std::vector<glm::vec3> planeNormals;
 
-// bunny model data
-GLuint bunnyVertexArrayID;
-unsigned int bunnyVertexBufferId, bunnyUvBufferId, bunnyNormalBufferId;
-std::vector<glm::vec3> bunnyVertices;
-std::vector<glm::vec2> bunnyUvs;
-std::vector<glm::vec3> bunnyNormals;
-
 // shader 
 GLuint program;
 GLuint program_depth;
@@ -177,7 +169,7 @@ GLint dissolvingEffects = 1;
 
 // projective texture
 GLuint projTextureID;
-float bias = 0;
+float bias = -1;
 
 int main(int argc, char *argv[])
 {
@@ -186,7 +178,7 @@ int main(int argc, char *argv[])
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	
 	// remember to replace "YourStudentID" with your own student ID
-	glutCreateWindow("CG_HW2_0756623");
+	glutCreateWindow("CG_FinalProject_Relight");
 	glutReshapeWindow(512, 512);
 
 	glewInit();
@@ -209,8 +201,10 @@ int main(int argc, char *argv[])
 
 void init(void)
 {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 	glEnable(GL_CULL_FACE);
 
 	mainTextureID = loadTexture(main_tex_dir, 1024, 1024);
@@ -317,65 +311,16 @@ void init(void)
 	glBindBuffer(GL_ARRAY_BUFFER, planeNormalBufferId);
 	glBufferData(GL_ARRAY_BUFFER, planeNormals.size() * sizeof(glm::vec3), &planeNormals[0], GL_STATIC_DRAW);
 
-	// create bunny vao
-	subModel = glmReadOBJ(obj_file_dir2);
-	glmFacetNormals(subModel);
-	glmVertexNormals(subModel, 90.0, GL_FALSE);
-	glEnable(GL_DEPTH_TEST);
-	print_model_info(subModel);
-
-	for (int i = 0; i < (int)subModel->numtriangles; i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			GLuint vindice = subModel->triangles[i].vindices[j];
-			glm::vec3 position;
-			position.x = subModel->vertices[vindice * 3 + 0];
-			position.y = subModel->vertices[vindice * 3 + 1];
-			position.z = subModel->vertices[vindice * 3 + 2];
-			bunnyVertices.push_back(position);
-		}
-		for (int k = 0; k < 3; k++)
-		{
-			GLuint tindice = subModel->triangles[i].tindices[k];
-			glm::vec2 uv;
-			uv.x = subModel->texcoords[tindice * 2 + 0];
-			uv.y = subModel->texcoords[tindice * 2 + 1];
-			bunnyUvs.push_back(uv);
-		}
-		for (int l = 0; l < 3; l++)
-		{
-			GLuint nindices = subModel->triangles[i].nindices[l];
-			glm::vec3 normal;
-			normal.x = subModel->normals[nindices * 3 + 0];
-			normal.y = subModel->normals[nindices * 3 + 1];
-			normal.z = subModel->normals[nindices * 3 + 2];
-			bunnyNormals.push_back(normal);
-		}
-	}
-	printf("vertices: %d, uvs: %d, noramls: %d\n", bunnyVertices.size(), bunnyUvs.size(), bunnyNormals.size());
-	glGenVertexArrays(1, &bunnyVertexArrayID);
-	glBindVertexArray(bunnyVertexArrayID);
-	glGenBuffers(1, &bunnyVertexBufferId);
-	glBindBuffer(GL_ARRAY_BUFFER, bunnyVertexBufferId);
-	glBufferData(GL_ARRAY_BUFFER, bunnyVertices.size() * sizeof(glm::vec3), &bunnyVertices[0], GL_STATIC_DRAW);
-	glGenBuffers(1, &bunnyUvBufferId);
-	glBindBuffer(GL_ARRAY_BUFFER, bunnyUvBufferId);
-	glBufferData(GL_ARRAY_BUFFER, bunnyUvs.size() * sizeof(glm::vec2), &bunnyUvs[0], GL_STATIC_DRAW);
-	glGenBuffers(1, &bunnyNormalBufferId);
-	glBindBuffer(GL_ARRAY_BUFFER, bunnyNormalBufferId);
-	glBufferData(GL_ARRAY_BUFFER, bunnyNormals.size() * sizeof(glm::vec3), &bunnyNormals[0], GL_STATIC_DRAW);
-
 	// Depth texture. Slower than a depth buffer, but you can sample it later in your shader
 	glGenTextures(1, &depthTexture);
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	GLfloat shaowborderColor[] = { 0.0, 0.0, 0.0, 0.0 };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, shaowborderColor);
 
 	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
 	glGenFramebuffers(1, &FramebufferName);
@@ -485,79 +430,42 @@ void display(void)
 	//繪製球體結束
 	glPopMatrix();
 	
-	//繪製兔子
-	glPushMatrix();
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		glTranslatef(subModel_pos[0], subModel_pos[1], subModel_pos[2]);
-		glRotatef(subModel_rot[0], 1, 0, 0);
-		glRotatef(subModel_rot[1], 0, 1, 0);
-		glRotatef(subModel_rot[2], 0, 0, 1);
-
-		//取得兔子model matrix
-		glGetFloatv(GL_MODELVIEW_MATRIX, now_model_matrix);
-		ModelMatrix = glm::mat4(now_model_matrix[0], now_model_matrix[1], now_model_matrix[2], now_model_matrix[3],
-			now_model_matrix[4], now_model_matrix[5], now_model_matrix[6], now_model_matrix[7],
-			now_model_matrix[8], now_model_matrix[9], now_model_matrix[10], now_model_matrix[11],
-			now_model_matrix[12], now_model_matrix[13], now_model_matrix[14], now_model_matrix[15]);
-		glUniformMatrix4fv(glGetUniformLocation(program_depth, "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
-	
-		//渲染兔子
-		glEnableVertexAttribArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, bunnyVertexBufferId);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glDrawArrays(GL_TRIANGLES, 0, bunnyVertices.size());
-		glDisableVertexAttribArray(0);
-
-	//繪製兔子結束
-	glPopMatrix();
-	
 	//取消shader
 	glUseProgram(0);
 
 	//製作frame buffer 結束
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	/*------------------------------------------------------------------------------------------------*/
-	
 	//回復視野範圍
 	glViewport(0, 0, screenWidth, screenHeight);
 
 	//清除資料
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//繪製燈光位置
-	glPushMatrix();
-		glMatrixMode(GL_MODELVIEW);
-		glColor3f(1, 1, 1);
-		draw_light_bulb();
-	glPopMatrix();
-
-	//使用shadow mapping shader
-	glUseProgram(program);
+	/*------------------------------------------------------------------------------------------------*/
 
 	//取得projection matrix
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (GLfloat)screenWidth / (GLfloat)screenHeight, 0.1f, 100.0f);
 
 	//調整視野
 	glPushMatrix();
-		//glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		gluLookAt(
-			eyex, 
-			eyey, 
+			eyex,
+			eyey,
 			eyez,
-			eyex+cos(eyet*M_PI/180)*cos(eyep*M_PI / 180), 
-			eyey+sin(eyet*M_PI / 180), 
-			eyez-cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180),
+			eyex + cos(eyet * M_PI / 180) * cos(eyep * M_PI / 180),
+			eyey + sin(eyet * M_PI / 180),
+			eyez - cos(eyet * M_PI / 180) * sin(eyep * M_PI / 180),
 			0.0,
 			1.0,
-			0.0);
+			0.0
+		);
 
 		//取得view matrix
 		GLfloat viewMatrix[16];
 		glGetFloatv(GL_MODELVIEW_MATRIX, viewMatrix);
-		glm::mat4 matViewMatrix = glm::mat4{ 
+		glm::mat4 matViewMatrix = glm::mat4{
 			viewMatrix[0], viewMatrix[1], viewMatrix[2], viewMatrix[3],
 			viewMatrix[4], viewMatrix[5], viewMatrix[6], viewMatrix[7],
 			viewMatrix[8], viewMatrix[9], viewMatrix[10], viewMatrix[11],
@@ -567,14 +475,135 @@ void display(void)
 	//調整視野結束
 	glPopMatrix();
 
+	/*------------------------------------------------------------------------------------------------*/
+
+	//使用projective texture shader
+	glUseProgram(projective_texture);
+
+	/*
+		Setting projective texture shader
+		As the projective space is [-1, 1], we translated it to [0, 1].
+	*/
+	glm::mat4 scaleTrans = glm::mat4(
+		0.5f, 0, 0, 0.5f,
+		0, 0.5f, 0, 0.5f,
+		0, 0, 0.5f, 0.5f,
+		0, 0, 0, 1
+	);
+	glm::mat4 projectorMatrix = scaleTrans * projection * matViewMatrix;
+	glUniformMatrix4fv(glGetUniformLocation(projective_texture, "ProjectorMatrix"), 1, GL_FALSE, &projectorMatrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(projective_texture, "projection"), 1, GL_FALSE, &projection[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(projective_texture, "view"), 1, GL_FALSE, &matViewMatrix[0][0]);
+
+	/*
+		Loading the proejctive texture for shader
+	*/
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, projTextureID);
+	glUniform1i(glGetUniformLocation(projective_texture, "ProjectTex"), 0);
+
+	/*
+		Loading the projective bias
+	*/
+	glUniform1f(glGetUniformLocation(projective_texture, "bias"), bias);
+
+	//繪製平面
+	glPushMatrix();
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glTranslatef(plane_pos[0], plane_pos[1], plane_pos[2]);
+		glRotatef(plane_rot[0], 1, 0, 0);
+		glRotatef(plane_rot[1], 0, 1, 0);
+		glRotatef(plane_rot[2], 0, 0, 1);
+		glColor3f(1, 1, 1);
+
+		//取得平面model matrix
+		glGetFloatv(GL_MODELVIEW_MATRIX, now_model_matrix);
+		ModelMatrix = glm::mat4(now_model_matrix[0], now_model_matrix[1], now_model_matrix[2], now_model_matrix[3],
+			now_model_matrix[4], now_model_matrix[5], now_model_matrix[6], now_model_matrix[7],
+			now_model_matrix[8], now_model_matrix[9], now_model_matrix[10], now_model_matrix[11],
+			now_model_matrix[12], now_model_matrix[13], now_model_matrix[14], now_model_matrix[15]);
+		glUniformMatrix4fv(glGetUniformLocation(projective_texture, "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
+
+		//畫出圖形
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, planeVertexBufferId);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, planeNormalBufferId);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glEnableVertexAttribArray(2);
+		glBindBuffer(GL_ARRAY_BUFFER, planeUvBufferId);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glDrawArrays(GL_TRIANGLES, 0, planeVertices.size());
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(2);
+		glBindTexture(GL_TEXTURE0, 0);
+
+	//繪製平面結束
+	glPopMatrix();
+
+	//繪製球體
+	glPushMatrix();
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]);
+		glRotatef(ball_rot[0], 1, 0, 0);
+		glRotatef(ball_rot[1], 0, 1, 0);
+		glRotatef(ball_rot[2], 0, 0, 1);
+		glColor3f(1, 1, 1);
+
+		//設定球體model matrix
+		glGetFloatv(GL_MODELVIEW_MATRIX, now_model_matrix);// pass the model matrix
+		ModelMatrix = glm::mat4(now_model_matrix[0], now_model_matrix[1], now_model_matrix[2], now_model_matrix[3],
+			now_model_matrix[4], now_model_matrix[5], now_model_matrix[6], now_model_matrix[7],
+			now_model_matrix[8], now_model_matrix[9], now_model_matrix[10], now_model_matrix[11],
+			now_model_matrix[12], now_model_matrix[13], now_model_matrix[14], now_model_matrix[15]);
+		glUniformMatrix4fv(glGetUniformLocation(projective_texture, "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
+
+		//渲染球體
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, ballVertexBufferId);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, ballNormalBufferId);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glEnableVertexAttribArray(2);
+		glBindBuffer(GL_ARRAY_BUFFER, ballUvBufferId);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glDrawArrays(GL_TRIANGLES, 0, ballVertices.size());
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(2);
+		glBindTexture(GL_TEXTURE0, 0);
+
+	//繪製球體結束
+	glPopMatrix();
+
+	//關閉shadow mapping shader
+	glUseProgram(0);
+
+	/*------------------------------------------------------------------------------------------------*/
+	/*
+	//使用shadow mapping shader
+	glUseProgram(program);
+
+	//繪製燈光位置
+	glPushMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glColor3f(1, 1, 1);
+	draw_light_bulb();
+	glPopMatrix();
+
 	//傳入shader屬性
 	glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, &projection[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &viewMatrix[0]);
 	glUniform3fv(glGetUniformLocation(program, "lightPos"), 1, &light_pos[0]);
 	GLfloat cameraPos[3] = { eyex, eyey, eyez };
-	glUniform3fv(glGetUniformLocation(program, "viePos"), 1, &cameraPos[0]);
+	glUniform3fv(glGetUniformLocation(program, "viewPos"), 1, &cameraPos[0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
-	
+
 	//設定陰影貼圖
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
@@ -589,7 +618,7 @@ void display(void)
 		glRotatef(plane_rot[1], 0, 1, 0);
 		glRotatef(plane_rot[2], 0, 0, 1);
 		glColor3f(1, 1, 1);
-		
+
 		//取得平面model matrix
 		glGetFloatv(GL_MODELVIEW_MATRIX, now_model_matrix);
 		ModelMatrix = glm::mat4(now_model_matrix[0], now_model_matrix[1], now_model_matrix[2], now_model_matrix[3],
@@ -605,14 +634,14 @@ void display(void)
 
 		//畫出圖形
 		glEnableVertexAttribArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, planeVertexBufferId);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glBindBuffer(GL_ARRAY_BUFFER, planeVertexBufferId);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, planeNormalBufferId);
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glBindBuffer(GL_ARRAY_BUFFER, planeNormalBufferId);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		glEnableVertexAttribArray(2);
-			glBindBuffer(GL_ARRAY_BUFFER, planeUvBufferId);
-			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glBindBuffer(GL_ARRAY_BUFFER, planeUvBufferId);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		glDrawArrays(GL_TRIANGLES, 0, planeVertices.size());
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
@@ -681,78 +710,8 @@ void display(void)
 
 	//關閉shadow mapping shader
 	glUseProgram(0);
-
+	*/
 	/*------------------------------------------------------------------------------------------------*/
-
-	//使用projective texture shader
-	glUseProgram(projective_texture);
-
-	/*
-		Setting projective texture shader
-		As the projective space is [-1, 1], we translated it to [0, 1].
-	*/
-	//glm::mat4 scaleTrans = glm::scale(glm::translate(glm::mat4(1.0), glm::vec3(0.5f)), glm::vec3(0.5f));
-	glm::mat4 scaleTrans = glm::mat4(
-		0.5f, 0, 0, 0.5f,
-		0, 0.5f, 0, 0.5f,
-		0, 0, 0.5f, 0.5f,
-		0, 0, 0, 1
-	);
-	print_mat4("scale trans", &scaleTrans[0][0]);
-	glm::mat4 projectorMatrix = scaleTrans * projection * matViewMatrix;
-	glUniformMatrix4fv(glGetUniformLocation(projective_texture, "ProjectorMatrix"), 1, GL_FALSE, &projectorMatrix[0][0]);
-	//print_mat4("projector matrxi", &projectorMatrix[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(projective_texture, "projection"), 1, GL_FALSE, &projection[0][0]);
-	//print_mat4("projection", &projection[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(projective_texture, "view"), 1, GL_FALSE, &matViewMatrix[0][0]);
-	//print_mat4("view", &matViewMatrix[0][0]);
-	glUniform1f(glGetUniformLocation(projective_texture, "bias"), bias);
-
-	/*
-		Loading the proejctive texture for shader
-	*/
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, projTextureID);
-	glUniform1i(glGetUniformLocation(projective_texture, "ProjectTex"), 0);
-
-	//繪製兔子
-	glPushMatrix();
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		glTranslatef(subModel_pos[0], subModel_pos[1], subModel_pos[2]);
-		glRotatef(subModel_rot[0], 1, 0, 0);
-		glRotatef(subModel_rot[1], 0, 1, 0);
-		glRotatef(subModel_rot[2], 0, 0, 1);
-
-		//取得兔子model matrix
-		glGetFloatv(GL_MODELVIEW_MATRIX, now_model_matrix);
-		ModelMatrix = glm::mat4(now_model_matrix[0], now_model_matrix[1], now_model_matrix[2], now_model_matrix[3],
-			now_model_matrix[4], now_model_matrix[5], now_model_matrix[6], now_model_matrix[7],
-			now_model_matrix[8], now_model_matrix[9], now_model_matrix[10], now_model_matrix[11],
-			now_model_matrix[12], now_model_matrix[13], now_model_matrix[14], now_model_matrix[15]);
-		glUniformMatrix4fv(glGetUniformLocation(projective_texture, "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
-
-		//畫出圖形
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, bunnyVertexBufferId);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, bunnyNormalBufferId);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, bunnyUvBufferId);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glDrawArrays(GL_TRIANGLES, 0, bunnyVertices.size());
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(2);
-		glBindTexture(GL_TEXTURE0, 0);
-
-	//繪製兔子結束
-	glPopMatrix();
-
-	//關閉shadow mapping shader
-	glUseProgram(0);
 
 	glutSwapBuffers();
 	camera_light_ball_move();

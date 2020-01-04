@@ -10,11 +10,11 @@ out vec4 FragColor;
 
 void main()
 {
-	vec4 projTexColor = vec4(0.0);
-	if ( texture( ProjectTex, (ProjTexCoord.xy/ProjTexCoord.w) ).z  <  (ProjTexCoord.z-bias)/ProjTexCoord.w )
-	{
-		projTexColor = texture(ProjectTex, ProjTexCoord.xy/ProjTexCoord.w);
-	}
+	vec4 projTexColor = vec4(1.0, 0.0, 0.0, 1.0);
+	//if ( texture( ProjectTex, (ProjTexCoord.xy/ProjTexCoord.w) ).z  <  (ProjTexCoord.z-bias)/ProjTexCoord.w )
+	//{
+		
+	//}
+	projTexColor = texture(ProjectTex, ProjTexCoord.xy/ProjTexCoord.w);
 	FragColor = projTexColor;
-	//FragColor = texture(ProjectTex, TexCoords);
 }

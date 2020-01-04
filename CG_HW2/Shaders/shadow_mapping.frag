@@ -60,9 +60,9 @@ void main()
     // shadwing
     float shadow = ShadowCalculation(fs_in.FragPosLightSpace);    
 	
-	vec3 lighting = (1.0 - shadow) * color;
+	//vec3 lighting = (1.0 - shadow) * color;
 	//vec3 lighting = shadow * color;
-	//vec3 lighting = shadow; 
+	vec3 lighting = shadow; 
 
 	if(dissolvingEffects==1)
 	{
