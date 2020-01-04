@@ -485,10 +485,10 @@ void display(void)
 		As the projective space is [-1, 1], we translated it to [0, 1].
 	*/
 	glm::mat4 scaleTrans = glm::mat4(
-		0.5f, 0, 0, 0.5f,
-		0, 0.5f, 0, 0.5f,
-		0, 0, 0.5f, 0.5f,
-		0, 0, 0, 1
+		0.5f, 0, 0, 0,
+		0, -0.5f, 0, 0,
+		0, 0, 0.5f, 0,
+		0.5f, 0.5f, 0.5f, 1
 	);
 	glm::mat4 projectorMatrix = scaleTrans * projection * matViewMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(projective_texture, "ProjectorMatrix"), 1, GL_FALSE, &projectorMatrix[0][0]);
