@@ -67,7 +67,7 @@ namespace
 	char *floor_tex_dir = "../Resources/WoodFine.ppm";
 	char *plane_file_dir = "../Resources/plane.obj";
 	char *noise_tex_dir = "../Resources/noise.ppm";
-	char* projective_tex_dir = "../Resources/test2.ppm";
+	char* projective_tex_dir = "../Resources/cube.ppm";
 	
 	GLfloat light_rad = 0.05; //radius of the light bulb
 	float eyet = -5.59; //theta in degree
@@ -120,12 +120,12 @@ GLMmodel *model; // TA has already loaded the model for you(!but you still need 
 GLMmodel *planeModel;
 GLMmodel *subModel;
 
-float eyex = -3.291;
-float eyey = 1.57;
-float eyez = 11.89;
+float eyex = 0;
+float eyey = 0;
+float eyez = 6;
 
 GLfloat light_pos[] = { 1.1, 3.5, 1.3 };
-GLfloat ball_pos[] = { 0.0, 0.0, 0.0 };
+GLfloat ball_pos[] = { 0.0, -3, 0.0 };
 GLfloat ball_rot[] = { 0.0, 0.0, 0.0 };
 GLfloat plane_pos[] = { 0.0, -5.0, 0.0 };
 GLfloat plane_rot[] = { 0.0, 0.0, 0.0 };
@@ -344,6 +344,7 @@ void init(void)
 
 void display(void)
 {
+	printf("eye pos: %f, %f, %f\n", eyex, eyey, eyez);
 	glm::mat4 lightProjection, lightView;
 	glm::mat4 lightSpaceMatrix;
 	GLfloat near_plane = 0.01f, far_plane = 50.0f;
@@ -380,6 +381,7 @@ void display(void)
 		glRotatef(ball_rot[0], 1, 0, 0);
 		glRotatef(ball_rot[1], 0, 1, 0);
 		glRotatef(ball_rot[2], 0, 0, 1);
+		glScalef(2.0f, 2.0f, 2.0f);
 		glColor3f(1, 1, 1);
 
 		//取得球體model matrix
@@ -570,6 +572,7 @@ void display(void)
 		glRotatef(ball_rot[0], 1, 0, 0);
 		glRotatef(ball_rot[1], 0, 1, 0);
 		glRotatef(ball_rot[2], 0, 0, 1);
+		glScalef(2.0f, 2.0f, 2.0f);
 		glColor3f(1, 1, 1);
 
 		//設定球體model matrix
