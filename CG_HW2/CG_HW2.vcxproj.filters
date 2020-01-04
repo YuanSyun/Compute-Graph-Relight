@@ -52,5 +52,7 @@
     <None Include="Shaders\depth.vert" />
     <None Include="Shaders\shadow_mapping.frag" />
     <None Include="Shaders\shadow_mapping.vert" />
+    <None Include="Shaders\projective_texture.frag" />
+    <None Include="Shaders\projective_texture.vert" />
   </ItemGroup>
 </Project>
