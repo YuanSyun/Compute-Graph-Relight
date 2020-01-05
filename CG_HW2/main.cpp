@@ -176,7 +176,7 @@ GLint dissolvingEffects = 1;
 GLuint texture00ID, texture01ID, texture10ID, texture11ID;
 GLuint fbo1, fbo2;
 GLuint resultTex1, resultTex2;
-float blending_time = 1.0f;
+float blending_time = 0.5f;
 
 int main(int argc, char *argv[])
 {
