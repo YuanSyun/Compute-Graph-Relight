@@ -173,10 +173,12 @@ GLboolean enableDissolving;
 GLint dissolvingEffects = 1;
 
 // projective texture
+int texture_width = 1340;
+int texture_height = 1125;
 GLuint texture00ID, texture01ID, texture10ID, texture11ID;
 GLuint fbo1, fbo2;
 GLuint resultTex1, resultTex2;
-float blending_time = 0.5f;
+float blending_time = 0.5;
 
 int main(int argc, char *argv[])
 {
@@ -218,8 +220,6 @@ void init(void)
 	floorTextureID = loadTexture(floor_tex_dir, 1024, 1024);
 	noiseTextureID = loadTexture(noise_tex_dir, 320, 320);
 
-	int texture_width = 1340;
-	int texture_height = 1125;
 	texture00ID = loadTexture(tex00_dir, texture_width, texture_height);
 	texture01ID = loadTexture(tex01_dir, texture_width, texture_height);
 	texture10ID = loadTexture(tex10_dir, texture_width, texture_height);
@@ -268,7 +268,7 @@ void init(void)
 	glGenBuffers(1, &ballVertexBufferId);																	
 	glBindBuffer(GL_ARRAY_BUFFER, ballVertexBufferId);												
 	glBufferData(GL_ARRAY_BUFFER, ballVertices.size() * sizeof(glm::vec3), &ballVertices[0], GL_STATIC_DRAW);	
-	glGenBuffers(1, &ballUvBufferId);																	
+	glGenBuffers(1, &ballUvBufferId);										
 	glBindBuffer(GL_ARRAY_BUFFER, ballUvBufferId);											
 	glBufferData(GL_ARRAY_BUFFER, ballUvs.size() * sizeof(glm::vec2), &ballUvs[0], GL_STATIC_DRAW);				
 	glGenBuffers(1, &ballNormalBufferId);																	
@@ -338,14 +338,14 @@ void init(void)
 	// create result 1's texture
 	glGenTextures(1, &resultTex1);
 	glBindTexture(GL_TEXTURE_2D, resultTex1);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_width, texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	// create result 2's texture
 	glGenTextures(1, &resultTex2);
 	glBindTexture(GL_TEXTURE_2D, resultTex2);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_width, texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -357,20 +357,16 @@ void init(void)
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	//create fram buffer1
-	glGenFramebuffers(2, &fbo1);
+	// Set "renderedTexture" as our colour attachement #0
+	glGenFramebuffers(1, &fbo1);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo1);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, resultTex1, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	//create fram buffer 2
-	glGenFramebuffers(3, &fbo2);
+	// Set "renderedTexture" as our colour attachement #0
+	glGenFramebuffers(1, &fbo2);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, resultTex2, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// APIs for creating shaders and creating shader programs have been done by TAs
@@ -542,6 +538,13 @@ void display(void)
 	glUseProgram(blending_program);
 
 	//assigning the matrixs
+	glm::mat4 blendingSampleScale = glm::mat4(
+		0.5f, 0, 0, 0,
+		0, 0.5f, 0, 0,
+		0, 0, 0.5f, 0,
+		0.5f, 0.5f, 0.5f, 1
+	);
+	projectorMatrix = blendingSampleScale * projection * matViewMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(blending_program, "projection"), 1, GL_FALSE, &projection[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(blending_program, "view"), 1, GL_FALSE, &matViewMatrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(blending_program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
@@ -656,15 +659,15 @@ void keyboard(unsigned char key, int x, int y) {
 	case '-': // increase dissolve threshold
 	{
 		// you may need to do somting here
-		dissolvingThreshold += 0.1f;
-		if (dissolvingThreshold > 1.0f) dissolvingThreshold = 1.0f;
+		blending_time += 0.1f;
+		if (blending_time > 1.0f) blending_time = 1.0f;
 		break;
 	}
 	case '=': // decrease dissolve threshold
 	{
 		// you may need to do somting here
-		dissolvingThreshold -= 0.1f;
-		if (dissolvingThreshold < 0.0f) dissolvingThreshold = 0.0f;
+		blending_time -= 0.1f;
+		if (blending_time < 0.0f) blending_time = 0.0f;
 		break;
 	}
 	case 'd':
@@ -1150,6 +1153,10 @@ void print_mat4(char* s, float *m)
 
 void render_scene(GLuint framebuffer_name, GLuint shadow_image, GLuint hightlight_image, glm::mat4 projection, glm::mat4 viewMatrix, glm:: mat4 lightSpaceMatrix, glm::mat4 projectiveTextureMatrix)
 {
+
+	//回復視野範圍
+	glViewport(0, 0, texture_width, texture_height);
+
 	//啟動frame buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_name);
 
@@ -1223,7 +1230,7 @@ void render_scene(GLuint framebuffer_name, GLuint shadow_image, GLuint hightligh
 	glEnableVertexAttribArray(2);
 		glBindBuffer(GL_ARRAY_BUFFER, planeUvBufferId);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	//glDrawArrays(GL_TRIANGLES, 0, planeVertices.size());
+	glDrawArrays(GL_TRIANGLES, 0, planeVertices.size());
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
@@ -1273,7 +1280,7 @@ void render_scene(GLuint framebuffer_name, GLuint shadow_image, GLuint hightligh
 	glEnableVertexAttribArray(2);
 		glBindBuffer(GL_ARRAY_BUFFER, ballUvBufferId);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	//glDrawArrays(GL_TRIANGLES, 0, ballVertices.size());
+	glDrawArrays(GL_TRIANGLES, 0, ballVertices.size());
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
@@ -1293,4 +1300,7 @@ void render_scene(GLuint framebuffer_name, GLuint shadow_image, GLuint hightligh
 
 	//清除資料
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//回復視野範圍
+	glViewport(0, 0, screenWidth, screenHeight);
 }
