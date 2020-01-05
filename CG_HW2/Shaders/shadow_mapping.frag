@@ -1,4 +1,5 @@
 #version 330 core
+
 out vec4 FragColor;
 
 in VS_OUT {
@@ -64,7 +65,7 @@ void main()
 	vec3 t1 = texture(texture1, fs_in.ProjTexCoord.xy/fs_in.ProjTexCoord.w).xyz;
 
     // shadwing
-    float shadow = ShadowCalculation(fs_in.FragPosLightSpace);    
+    float shadow = ShadowCalculation(fs_in.FragPosLightSpace);
 	
 	vec3 lighting = mix(t0, t1, (1.0-shadow));
 	//vec3 lighting = shadow * color;

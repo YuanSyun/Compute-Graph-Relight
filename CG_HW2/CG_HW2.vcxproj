@@ -143,6 +143,8 @@
     <ClInclude Include="glm_helper.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\blending.frag" />
+    <None Include="Shaders\blending.vert" />
     <None Include="Shaders\depth.frag" />
     <None Include="Shaders\depth.vert" />
     <None Include="Shaders\projective_texture.frag" />

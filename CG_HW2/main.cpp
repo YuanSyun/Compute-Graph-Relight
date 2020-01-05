@@ -59,6 +59,7 @@ void draw_light_bulb(void);
 void camera_light_ball_move();
 GLuint loadTexture(char* name, GLfloat width, GLfloat height);
 void print_mat4(char* s, float* m);
+void render_scene(GLuint framebuffer_name, GLuint shadow_texture, GLuint hightlight_texture, glm::mat4 projection, glm::mat4 viewMatrix, glm::mat4 lightSpaceMatrix, glm::mat4 projectiveTextureMatrix);
 
 namespace
 {
@@ -153,6 +154,7 @@ std::vector<glm::vec3> planeNormals;
 // shader 
 GLuint program;
 GLuint program_depth;
+GLuint blending_program;
 const GLuint  SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
 // window size
@@ -172,7 +174,9 @@ GLint dissolvingEffects = 1;
 
 // projective texture
 GLuint texture00ID, texture01ID, texture10ID, texture11ID;
-float bias = -1;
+GLuint fbo1, fbo2;
+GLuint resultTex1, resultTex2;
+float blending_time = 1.0f;
 
 int main(int argc, char *argv[])
 {
@@ -258,14 +262,14 @@ void init(void)
 			ballNormals.push_back(normal);
 		}
 	}
-	printf("vertices: %d, uvs: %d, noramls: %d\n", ballVertices.size(), ballUvs.size(), ballNormals.size());
+	printf("ball vertices: %d, uvs: %d, noramls: %d\n", ballVertices.size(), ballUvs.size(), ballNormals.size());
 	glGenVertexArrays(1, &ballVertexArrayID);
 	glBindVertexArray(ballVertexArrayID);
 	glGenBuffers(1, &ballVertexBufferId);																	
-	glBindBuffer(GL_ARRAY_BUFFER, ballVertexBufferId);														
+	glBindBuffer(GL_ARRAY_BUFFER, ballVertexBufferId);												
 	glBufferData(GL_ARRAY_BUFFER, ballVertices.size() * sizeof(glm::vec3), &ballVertices[0], GL_STATIC_DRAW);	
-	glGenBuffers(1, &ballUvBufferId);																		
-	glBindBuffer(GL_ARRAY_BUFFER, ballUvBufferId);															
+	glGenBuffers(1, &ballUvBufferId);																	
+	glBindBuffer(GL_ARRAY_BUFFER, ballUvBufferId);											
 	glBufferData(GL_ARRAY_BUFFER, ballUvs.size() * sizeof(glm::vec2), &ballUvs[0], GL_STATIC_DRAW);				
 	glGenBuffers(1, &ballNormalBufferId);																	
 	glBindBuffer(GL_ARRAY_BUFFER, ballNormalBufferId);														
@@ -307,7 +311,7 @@ void init(void)
 			planeNormals.push_back(normal);
 		}
 	}
-	printf("vertices: %d, uvs: %d, noramls: %d\n", planeVertices.size(), planeUvs.size(), planeNormals.size());
+	printf("plane vertices: %d, uvs: %d, noramls: %d\n", planeVertices.size(), planeUvs.size(), planeNormals.size());
 	glGenVertexArrays(1, &planeVertexArrayID);
 	glBindVertexArray(planeVertexArrayID);
 	glGenBuffers(1, &planeVertexBufferId);
@@ -331,13 +335,43 @@ void init(void)
 	GLfloat shaowborderColor[] = { 1.0, 0.0, 0.0, 0.0 };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, shaowborderColor);
 
+	// create result 1's texture
+	glGenTextures(1, &resultTex1);
+	glBindTexture(GL_TEXTURE_2D, resultTex1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_width, texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	// create result 2's texture
+	glGenTextures(1, &resultTex2);
+	glBindTexture(GL_TEXTURE_2D, resultTex2);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_width, texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
 	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
 	glGenFramebuffers(1, &FramebufferName);
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);	
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//create fram buffer1
+	glGenFramebuffers(2, &fbo1);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo1);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, resultTex1, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//create fram buffer 2
+	glGenFramebuffers(3, &fbo2);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, resultTex2, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// APIs for creating shaders and creating shader programs have been done by TAs
 	// following is an example for creating a shader program using given vertex shader and fragment shader
@@ -350,11 +384,16 @@ void init(void)
 	GLuint frag = createShader("Shaders/shadow_mapping.frag", "fragment");
 	program = createProgram(vert, frag);
 	printf("loaded shadow map shader\n");
+
+	GLuint vert_blending = createShader("Shaders/blending.vert", "vertex");
+	GLuint frag_blending = createShader("Shaders/blending.frag", "fragment");
+	blending_program = createProgram(vert_blending, frag_blending);
+	printf("loaded blending shader\n");
 }
 
 void display(void)
 {
-	printf("eye pos: %f, %f, %f, %f, %f\n", eyex, eyey, eyez, eyet, eyep);
+	//printf("eye pos: %f, %f, %f, %f, %f\n", eyex, eyey, eyez, eyet, eyep);
 	glm::mat4 lightProjection, lightView;
 	glm::mat4 lightSpaceMatrix;
 	GLfloat near_plane = 0.01f, far_plane = 50.0f;
@@ -483,24 +522,6 @@ void display(void)
 
 	/*------------------------------------------------------------------------------------------------*/
 	
-	//使用shadow mapping shader
-	glUseProgram(program);
-
-	//繪製燈光位置
-	glPushMatrix();
-		//glMatrixMode(GL_MODELVIEW);
-		glColor3f(1, 1, 1);
-		draw_light_bulb();
-	glPopMatrix();
-
-	//傳入shader屬性
-	glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, &projection[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &viewMatrix[0]);
-	glUniform3fv(glGetUniformLocation(program, "lightPos"), 1, &light_pos[0]);
-	GLfloat cameraPos[3] = { eyex, eyey, eyez };
-	glUniform3fv(glGetUniformLocation(program, "viewPos"), 1, &cameraPos[0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
-
 	/*
 		Setting projective texture shader
 		As the projective space is [-1, 1], we translated it to [0, 1].
@@ -512,28 +533,32 @@ void display(void)
 		0.5f, 0.5f, 0.5f, 1
 	);
 	glm::mat4 projectorMatrix = scaleTrans * projection * matViewMatrix;
-	glUniformMatrix4fv(glGetUniformLocation(program, "ProjectorMatrix"), 1, GL_FALSE, &projectorMatrix[0][0]);
+	render_scene(fbo1, texture00ID, texture10ID, projection, matViewMatrix, lightSpaceMatrix, projectorMatrix);
+	render_scene(fbo2, texture01ID, texture11ID, projection, matViewMatrix, lightSpaceMatrix, projectorMatrix);
 
-	//設定陰影貼圖
+	/*------------------------------------------------------------------------------------------------*/
+
+	//start blending the result
+	glUseProgram(blending_program);
+
+	//assigning the matrixs
+	glUniformMatrix4fv(glGetUniformLocation(blending_program, "projection"), 1, GL_FALSE, &projection[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(blending_program, "view"), 1, GL_FALSE, &matViewMatrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(blending_program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(blending_program, "ProjectorMatrix"), 1, GL_FALSE, &projectorMatrix[0][0]);
+
+	//assigning result 1's texture
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, resultTex1);
+	glUniform1i(glGetUniformLocation(blending_program, "reusltTex1"), 0);
+
+	//assigning result 2's texture
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, depthTexture);
-	glUniform1i(glGetUniformLocation(program, "shadowMap"), 1);
+	glBindTexture(GL_TEXTURE_2D, resultTex2);
+	glUniform1i(glGetUniformLocation(blending_program, "reusltTex2"), 1);
 
-	/*
-		Loading the proejctive texture for shader
-	*/
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, texture01ID);
-	glUniform1i(glGetUniformLocation(program, "texture0"), 4);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, texture11ID);
-	glUniform1i(glGetUniformLocation(program, "texture1"), 5);
-
-	/*
-		Loading the projective bias
-	*/
-	glUniform1f(glGetUniformLocation(program, "bias"), bias);
-
+	//assigining the time
+	glUniform1f(glGetUniformLocation(blending_program, "time"), blending_time);
 
 	//繪製平面
 	glPushMatrix();
@@ -551,28 +576,22 @@ void display(void)
 			now_model_matrix[4], now_model_matrix[5], now_model_matrix[6], now_model_matrix[7],
 			now_model_matrix[8], now_model_matrix[9], now_model_matrix[10], now_model_matrix[11],
 			now_model_matrix[12], now_model_matrix[13], now_model_matrix[14], now_model_matrix[15]);
-		glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
-
-		//設定平面貼圖材質
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, floorTextureID);
-		glUniform1i(glGetUniformLocation(program, "diffuseTexture"), 0);
+		glUniformMatrix4fv(glGetUniformLocation(blending_program, "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
 
 		//畫出圖形
 		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, planeVertexBufferId);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+			glBindBuffer(GL_ARRAY_BUFFER, planeVertexBufferId);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, planeNormalBufferId);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+			glBindBuffer(GL_ARRAY_BUFFER, planeNormalBufferId);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, planeUvBufferId);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+			glBindBuffer(GL_ARRAY_BUFFER, planeUvBufferId);
+			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		glDrawArrays(GL_TRIANGLES, 0, planeVertices.size());
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(2);
-		glBindTexture(GL_TEXTURE0, 0);
 
 	//繪製平面結束
 	glPopMatrix();
@@ -593,51 +612,34 @@ void display(void)
 		ModelMatrix = glm::mat4(now_model_matrix[0], now_model_matrix[1], now_model_matrix[2], now_model_matrix[3],
 			now_model_matrix[4], now_model_matrix[5], now_model_matrix[6], now_model_matrix[7],
 			now_model_matrix[8], now_model_matrix[9], now_model_matrix[10], now_model_matrix[11],
-			now_model_matrix[12], now_model_matrix[13], now_model_matrix[14], now_model_matrix[15]);
-		glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
-
-		//設定球體貼圖
-		glActiveTexture(GL_TEXTURE0);	// set the texture
-		glBindTexture(GL_TEXTURE_2D, mainTextureID);
-		glUniform1i(glGetUniformLocation(program, "diffuseTexture"), 0);
-
-		//開啟透明度，針對dissolving效果
-		glEnable(GL_BLEND);
-		glDisable(GL_CULL_FACE);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		//設定dissolving貼圖
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, noiseTextureID);
-		glUniform1i(glGetUniformLocation(program, "noiseTexture"), 2);
-		glUniform1f(glGetUniformLocation(program, "dissolvingThreshold"), dissolvingThreshold);
-		glUniform1i(glGetUniformLocation(program, "dissolvingEffects"), dissolvingEffects);
+			now_model_matrix[12], now_model_matrix[13], now_model_matrix[14], now_model_matrix[15]
+		);
+		glUniformMatrix4fv(glGetUniformLocation(blending_program, "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
 
 		//渲染球體
 		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, ballVertexBufferId);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+			glBindBuffer(GL_ARRAY_BUFFER, ballVertexBufferId);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, ballNormalBufferId);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+			glBindBuffer(GL_ARRAY_BUFFER, ballNormalBufferId);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, ballUvBufferId);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+			glBindBuffer(GL_ARRAY_BUFFER, ballUvBufferId);
+			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		glDrawArrays(GL_TRIANGLES, 0, ballVertices.size());
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(2);
-		glBindTexture(GL_TEXTURE0, 0);
-		glUniform1i(glGetUniformLocation(program, "dissolvingEffects"), 0);
-		glDisable(GL_BLEND);
-		glEnable(GL_CULL_FACE);
 
 	//繪製球體結束
 	glPopMatrix();
 
-	//關閉shadow mapping shader
+	//finished the blending
 	glUseProgram(0);
-	
+
+	//清除資料
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	/*------------------------------------------------------------------------------------------------*/
 
 	glutSwapBuffers();
@@ -1144,4 +1146,151 @@ GLuint loadTexture(char* name, GLfloat width, GLfloat height)
 void print_mat4(char* s, float *m)
 {
 	printf("%s:\n[%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n %f %f %f %f]\n", s, m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
+}
+
+void render_scene(GLuint framebuffer_name, GLuint shadow_image, GLuint hightlight_image, glm::mat4 projection, glm::mat4 viewMatrix, glm:: mat4 lightSpaceMatrix, glm::mat4 projectiveTextureMatrix)
+{
+	//啟動frame buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_name);
+
+	//清除資料
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//使用shadow mapping shader
+	glUseProgram(program);
+
+	//繪製燈光位置
+	glPushMatrix();
+	//glMatrixMode(GL_MODELVIEW);
+	glColor3f(1, 1, 1);
+	draw_light_bulb();
+	glPopMatrix();
+
+	//傳入shader屬性
+	glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, &projection[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &viewMatrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "ProjectorMatrix"), 1, GL_FALSE, &projectiveTextureMatrix[0][0]);
+	glUniform3fv(glGetUniformLocation(program, "lightPos"), 1, &light_pos[0]);
+	GLfloat cameraPos[3] = { eyex, eyey, eyez };
+	glUniform3fv(glGetUniformLocation(program, "viewPos"), 1, &cameraPos[0]);
+	glUniform1f(glGetUniformLocation(program, "dissolvingThreshold"), dissolvingThreshold);
+
+	//Loading textures for shader
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, depthTexture);
+	glUniform1i(glGetUniformLocation(program, "shadowMap"), 1);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, noiseTextureID);
+	glUniform1i(glGetUniformLocation(program, "noiseTexture"), 2);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, shadow_image);
+	glUniform1i(glGetUniformLocation(program, "texture0"), 3);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, hightlight_image);
+	glUniform1i(glGetUniformLocation(program, "texture1"), 4);
+
+	//繪製平面
+	glPushMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslatef(plane_pos[0], plane_pos[1], plane_pos[2]);
+	glRotatef(plane_rot[0], 1, 0, 0);
+	glRotatef(plane_rot[1], 0, 1, 0);
+	glRotatef(plane_rot[2], 0, 0, 1);
+	glColor3f(1, 1, 1);
+
+	//取得平面model matrix
+	glGetFloatv(GL_MODELVIEW_MATRIX, now_model_matrix);
+	ModelMatrix = glm::mat4(now_model_matrix[0], now_model_matrix[1], now_model_matrix[2], now_model_matrix[3],
+		now_model_matrix[4], now_model_matrix[5], now_model_matrix[6], now_model_matrix[7],
+		now_model_matrix[8], now_model_matrix[9], now_model_matrix[10], now_model_matrix[11],
+		now_model_matrix[12], now_model_matrix[13], now_model_matrix[14], now_model_matrix[15]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
+
+	//設定平面貼圖材質
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, floorTextureID);
+	glUniform1i(glGetUniformLocation(program, "diffuseTexture"), 0);
+
+	//畫出圖形
+	glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, planeVertexBufferId);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, planeNormalBufferId);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(2);
+		glBindBuffer(GL_ARRAY_BUFFER, planeUvBufferId);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	//glDrawArrays(GL_TRIANGLES, 0, planeVertices.size());
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+	glBindTexture(GL_TEXTURE0, 0);
+
+	//繪製平面結束
+	glPopMatrix();
+
+	//繪製球體
+	glPushMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]);
+	glRotatef(ball_rot[0], 1, 0, 0);
+	glRotatef(ball_rot[1], 0, 1, 0);
+	glRotatef(ball_rot[2], 0, 0, 1);
+	glScalef(2.0f, 2.0f, 2.0f);
+	glColor3f(1, 1, 1);
+
+	//設定球體model matrix
+	glGetFloatv(GL_MODELVIEW_MATRIX, now_model_matrix);// pass the model matrix
+	ModelMatrix = glm::mat4(now_model_matrix[0], now_model_matrix[1], now_model_matrix[2], now_model_matrix[3],
+		now_model_matrix[4], now_model_matrix[5], now_model_matrix[6], now_model_matrix[7],
+		now_model_matrix[8], now_model_matrix[9], now_model_matrix[10], now_model_matrix[11],
+		now_model_matrix[12], now_model_matrix[13], now_model_matrix[14], now_model_matrix[15]
+	);
+	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
+
+	//設定球體貼圖
+	glActiveTexture(GL_TEXTURE0);	// set the texture
+	glBindTexture(GL_TEXTURE_2D, mainTextureID);
+	glUniform1i(glGetUniformLocation(program, "diffuseTexture"), 0);
+
+	//開啟透明度，針對dissolving效果
+	glEnable(GL_BLEND);
+	glDisable(GL_CULL_FACE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glUniform1i(glGetUniformLocation(program, "dissolvingEffects"), dissolvingEffects);
+
+	//渲染球體
+	glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, ballVertexBufferId);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, ballNormalBufferId);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(2);
+		glBindBuffer(GL_ARRAY_BUFFER, ballUvBufferId);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	//glDrawArrays(GL_TRIANGLES, 0, ballVertices.size());
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+	glBindTexture(GL_TEXTURE0, 0);
+	glUniform1i(glGetUniformLocation(program, "dissolvingEffects"), 0);
+	glDisable(GL_BLEND);
+	glEnable(GL_CULL_FACE);
+
+	//繪製球體結束
+	glPopMatrix();
+
+	//製作frame buffer 結束
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//關閉shadow mapping shader
+	glUseProgram(0);
+
+	//清除資料
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
