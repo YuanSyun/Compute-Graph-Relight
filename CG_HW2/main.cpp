@@ -67,7 +67,11 @@ namespace
 	char *floor_tex_dir = "../Resources/WoodFine.ppm";
 	char *plane_file_dir = "../Resources/plane.obj";
 	char *noise_tex_dir = "../Resources/noise.ppm";
-	char* projective_tex_dir = "../Resources/cube.ppm";
+
+	char* tex00_dir = "../Resources/t00.ppm";
+	char* tex01_dir = "../Resources/t01.ppm";
+	char* tex10_dir = "../Resources/t10.ppm";
+	char* tex11_dir = "../Resources/t11.ppm";
 	
 	GLfloat light_rad = 0.05; //radius of the light bulb
 	float eyet = -29.470; //theta in degree
@@ -167,7 +171,7 @@ GLboolean enableDissolving;
 GLint dissolvingEffects = 1;
 
 // projective texture
-GLuint projTextureID;
+GLuint texture00ID, texture01ID, texture10ID, texture11ID;
 float bias = -1;
 
 int main(int argc, char *argv[])
@@ -209,7 +213,13 @@ void init(void)
 	mainTextureID = loadTexture(main_tex_dir, 1024, 1024);
 	floorTextureID = loadTexture(floor_tex_dir, 1024, 1024);
 	noiseTextureID = loadTexture(noise_tex_dir, 320, 320);
-	projTextureID = loadTexture(projective_tex_dir, 2000, 1681);
+
+	int texture_width = 1340;
+	int texture_height = 1125;
+	texture00ID = loadTexture(tex00_dir, texture_width, texture_height);
+	texture01ID = loadTexture(tex01_dir, texture_width, texture_height);
+	texture10ID = loadTexture(tex10_dir, texture_width, texture_height);
+	texture11ID = loadTexture(tex11_dir, texture_width, texture_height);
 
 	// create ball vao
 	model = glmReadOBJ(obj_file_dir);
@@ -513,8 +523,11 @@ void display(void)
 		Loading the proejctive texture for shader
 	*/
 	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, projTextureID);
-	glUniform1i(glGetUniformLocation(program, "ProjectTex"), 4);
+	glBindTexture(GL_TEXTURE_2D, texture01ID);
+	glUniform1i(glGetUniformLocation(program, "texture0"), 4);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, texture11ID);
+	glUniform1i(glGetUniformLocation(program, "texture1"), 5);
 
 	/*
 		Loading the projective bias

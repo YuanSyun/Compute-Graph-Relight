@@ -12,7 +12,8 @@ in VS_OUT {
 uniform sampler2D diffuseTexture;
 uniform sampler2D shadowMap;
 uniform sampler2D noiseTexture;
-uniform sampler2D ProjectTex;
+uniform sampler2D texture0;
+uniform sampler2D texture1;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 uniform float dissolvingThreshold;
@@ -59,12 +60,13 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 void main()
 {         
     //vec3 color = texture(diffuseTexture, fs_in.TexCoords).rgb;
-	vec3 color = texture(ProjectTex, fs_in.ProjTexCoord.xy/fs_in.ProjTexCoord.w).xyz;
+	vec3 t0 = texture(texture0, fs_in.ProjTexCoord.xy/fs_in.ProjTexCoord.w).xyz;
+	vec3 t1 = texture(texture1, fs_in.ProjTexCoord.xy/fs_in.ProjTexCoord.w).xyz;
 
     // shadwing
     float shadow = ShadowCalculation(fs_in.FragPosLightSpace);    
 	
-	vec3 lighting = (1.0 - shadow) * color;
+	vec3 lighting = mix(t0, t1, (1.0-shadow));
 	//vec3 lighting = shadow * color;
 	//vec3 lighting = shadow; 
 
