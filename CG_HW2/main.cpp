@@ -77,8 +77,8 @@ namespace
 	char* tex11_dir = "../Resources/t11.ppm";
 	
 	GLfloat light_rad = 0.05; //radius of the light bulb
-	float eyet = -29.470; //theta in degree
-	float eyep = 107.700; //phi in degree
+	float eyet = -29.469999; //theta in degree
+	float eyep = 107.699997; //phi in degree
 	bool mleft = false;
 	bool mright = false;
 	bool mmiddle = false;
@@ -125,9 +125,9 @@ GLMmodel *model; // TA has already loaded the model for you(!but you still need 
 GLMmodel *planeModel;
 GLMmodel *subModel;
 
-float eyex = 3.024;
-float eyey = 2.304;
-float eyez = 11.125;
+float eyex = 0.983236;
+float eyey = -1.223410;
+float eyez = 5.223782;
 
 GLfloat light_pos1[] = { 1.1, 3.5, 1.3 };
 GLfloat light_pos2[] = { 1.1, 3.5, 1.3 };
@@ -405,7 +405,7 @@ void init(void)
 
 void display(void)
 {
-	printf("eye pos: %f, %f, %f, %f, %f\n", eyex, eyey, eyez, eyet, eyep);
+	// printf("eye pos: %f, %f, %f, %f, %f\n", eyex, eyey, eyez, eyet, eyep);
 	
 	/*------------------------------------------------------------------------------------------------*/
 	glm::mat4 lightProjection, lightView1, lightView2;
@@ -741,11 +741,11 @@ void keyboard(unsigned char key, int x, int y) {
 		ball_rot[0] = 0;
 		ball_rot[1] = 0;
 		ball_rot[2] = 0;
-		eyex = 1.953;
-		eyey = 0.499;
-		eyez = 11.221;
-		eyet = -5.59; //theta in degree
-		eyep = 83.2; //phi in degree
+		eyex = 0.983236;
+		eyey = -1.223410;
+		eyez = 5.223782;
+		eyet = -29.469999; //theta in degree
+		eyep = 107.699997; //phi in degree
 		break;
 	}
 	case 'v':
