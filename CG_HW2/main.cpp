@@ -63,7 +63,7 @@ void render_scene(GLuint framebuffer_name, GLuint shadow_texture, GLuint hightli
 
 namespace
 {
-	char *obj_file_dir = "../Resources/cube.obj";
+	char *obj_file_dir = "../Resources/TestCube3.obj";
 	char *main_tex_dir = "../Resources/Stone.ppm";
 	char *floor_tex_dir = "../Resources/WoodFine.ppm";
 	char *plane_file_dir = "../Resources/plane.obj";
@@ -712,13 +712,34 @@ void keyboard(unsigned char key, int x, int y) {
 	}
 	case 'h':
 	{
-		lright = true;
-		break;
+		blending_time -= 0.01f;
+		printf("%f\n", blending_time);
+		if (blending_time < 0.1f)
+		{
+			blending_time = 0.1f;
+			break;
+		}
+		else
+		{
+			lright = true;
+			printf("lright");
+			break;
+		}
 	}
 	case 'f':
 	{
-		lleft = true;
-		break;
+		printf("%f\n", blending_time);
+		blending_time += 0.01f;
+		if (blending_time > 0.9f)
+		{
+			blending_time = 0.9f;
+			break;
+		}
+		else
+		{
+			lleft = true;
+			break;
+		}
 	}
 	case 'r':
 	{
