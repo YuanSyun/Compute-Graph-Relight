@@ -389,7 +389,7 @@ void init(void)
 
 void display(void)
 {
-	//printf("eye pos: %f, %f, %f, %f, %f\n", eyex, eyey, eyez, eyet, eyep);
+	printf("eye pos: %f, %f, %f, %f, %f\n", eyex, eyey, eyez, eyet, eyep);
 	glm::mat4 lightProjection, lightView;
 	glm::mat4 lightSpaceMatrix;
 	GLfloat near_plane = 0.01f, far_plane = 50.0f;
