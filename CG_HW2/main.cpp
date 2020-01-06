@@ -59,11 +59,11 @@ void draw_light_bulb(void);
 void camera_light_ball_move();
 GLuint loadTexture(char* name, GLfloat width, GLfloat height);
 void print_mat4(char* s, float* m);
-void render_scene(GLuint framebuffer_name, GLuint shadow_texture, GLuint hightlight_texture, glm::mat4 projection, glm::mat4 viewMatrix, glm::mat4 lightSpaceMatrix);
+void render_scene(GLuint framebuffer_name, GLuint shadow_image, GLuint hightlight_image, glm::mat4 projection, glm::mat4 viewMatrix, glm::mat4 lightSpaceMatrix1, GLuint depth_texture1, glm::mat4 lightSpaceMatrix2, GLuint depth_texture2);
 void draw_plane(GLuint shader_name);
 void draw_cube(GLuint shader_name);
-void blending(glm::mat4 projection, glm::mat4 matViewMatrix, glm::mat4 lightSpaceMatrix);
-void render_depthmap(glm::mat4 lightSpaceMatrix);
+void blending(glm::mat4 projection, glm::mat4 matViewMatrix);
+void render_depthmap(GLuint fbo, glm::mat4 lightSpaceMatrix);
 
 namespace
 {
@@ -129,7 +129,8 @@ float eyex = 3.024;
 float eyey = 2.304;
 float eyez = 11.125;
 
-GLfloat light_pos[] = { 1.1, 3.5, 1.3 };
+GLfloat light_pos1[] = { 1.1, 3.5, 1.3 };
+GLfloat light_pos2[] = { 1.1, 3.5, 1.3 };
 GLfloat ball_pos[] = { 0.0, -3, 0.0 };
 GLfloat ball_rot[] = { 0.0, 0.0, 0.0 };
 GLfloat plane_pos[] = { 0.0, -5.0, 0.0 };
@@ -161,9 +162,9 @@ const GLuint  SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 int screenWidth = 512;
 int screenHeight = 512;
 
-// frame buffer
-GLuint FramebufferName;
-GLuint depthTexture;
+// depth texture
+GLuint fbo_depth1, fbo_depth2;
+GLuint depthTexture1, depthTexture2;
 GLfloat now_model_matrix[16];
 glm::mat4 ModelMatrix;
 
@@ -176,7 +177,7 @@ GLint dissolvingEffects = 1;
 int texture_width = 1340;
 int texture_height = 1125;
 GLuint texture00ID, texture01ID, texture10ID, texture11ID;
-GLuint fbo1, fbo2;
+GLuint fbo_render1, fbo_redner2;
 GLuint resultTex1, resultTex2;
 float blending_time = 0.5;
 
@@ -320,15 +321,26 @@ void init(void)
 	glBindBuffer(GL_ARRAY_BUFFER, planeNormalBufferId);
 	glBufferData(GL_ARRAY_BUFFER, planeNormals.size() * sizeof(glm::vec3), &planeNormals[0], GL_STATIC_DRAW);
 
+	GLfloat shaowborderColor[] = { 1.0, 0.0, 0.0, 0.0 };
+
 	// Depth texture. Slower than a depth buffer, but you can sample it later in your shader
-	glGenTextures(1, &depthTexture);
-	glBindTexture(GL_TEXTURE_2D, depthTexture);
+	glGenTextures(1, &depthTexture1);
+	glBindTexture(GL_TEXTURE_2D, depthTexture1);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	GLfloat shaowborderColor[] = { 1.0, 0.0, 0.0, 0.0 };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, shaowborderColor);
+
+	// Depth texture. Slower than a depth buffer, but you can sample it later in your shader
+	glGenTextures(1, &depthTexture2);
+	glBindTexture(GL_TEXTURE_2D, depthTexture2);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, shaowborderColor);
 
 	// create result 1's texture
@@ -346,22 +358,30 @@ void init(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
-	glGenFramebuffers(1, &FramebufferName);
-	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
+	glGenFramebuffers(1, &fbo_depth1);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo_depth1);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture1, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
+	glGenFramebuffers(1, &fbo_depth2);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo_depth2);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture2, 0);
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Set "renderedTexture" as our colour attachement #0
-	glGenFramebuffers(1, &fbo1);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo1);
+	glGenFramebuffers(1, &fbo_render1);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo_render1);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, resultTex1, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Set "renderedTexture" as our colour attachement #0
-	glGenFramebuffers(1, &fbo2);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
+	glGenFramebuffers(1, &fbo_redner2);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo_redner2);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, resultTex2, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -387,8 +407,9 @@ void display(void)
 {
 	printf("eye pos: %f, %f, %f, %f, %f\n", eyex, eyey, eyez, eyet, eyep);
 	
-	glm::mat4 lightProjection, lightView;
-	glm::mat4 lightSpaceMatrix;
+	/*------------------------------------------------------------------------------------------------*/
+	glm::mat4 lightProjection, lightView1, lightView2;
+	glm::mat4 lightSpaceMatrix1, lightSpaceMatrix2;
 	GLfloat near_plane = 0.01f, far_plane = 50.0f;
 
 	//取得燈光的projection matrix
@@ -397,14 +418,15 @@ void display(void)
 
 	//取得燈光的view matrix
 	glMatrixMode(GL_MODELVIEW);
-	lightView = glm::lookAt(glm::vec3(light_pos[0], light_pos[1], light_pos[2]), glm::vec3(ball_pos[0], ball_pos[1], ball_pos[2]), glm::vec3(0.0, 1.0, 0.0));
+	lightView1 = glm::lookAt(glm::vec3(light_pos1[0], light_pos1[1], light_pos1[2]), glm::vec3(ball_pos[0], ball_pos[1], ball_pos[2]), glm::vec3(0.0, 1.0, 0.0));
+	lightView2 = glm::lookAt(glm::vec3(light_pos2[0], light_pos2[1], light_pos2[2]), glm::vec3(ball_pos[0], ball_pos[1], ball_pos[2]), glm::vec3(0.0, 1.0, 0.0));
 
 	//傳入PV matrix
-	lightSpaceMatrix = lightProjection * lightView;
+	lightSpaceMatrix1 = lightProjection * lightView1;
+	lightSpaceMatrix2 = lightProjection * lightView2;
 
-	/*------------------------------------------------------------------------------------------------*/
-
-	render_depthmap(lightSpaceMatrix);
+	render_depthmap(fbo_depth1, lightSpaceMatrix1);
+	render_depthmap(fbo_depth2, lightSpaceMatrix2);
 
 	/*------------------------------------------------------------------------------------------------*/
 
@@ -415,15 +437,11 @@ void display(void)
 	glPushMatrix();
 		glLoadIdentity();
 		gluLookAt(
-			eyex,
-			eyey,
-			eyez,
+			eyex, eyey,	eyez,
 			eyex + cos(eyet * M_PI / 180) * cos(eyep * M_PI / 180),
 			eyey + sin(eyet * M_PI / 180),
 			eyez - cos(eyet * M_PI / 180) * sin(eyep * M_PI / 180),
-			0.0,
-			1.0,
-			0.0
+			0.0, 1.0, 0.0
 		);
 
 		//取得view matrix
@@ -441,12 +459,12 @@ void display(void)
 
 	/*------------------------------------------------------------------------------------------------*/
 	
-	render_scene(fbo1, texture00ID, texture10ID, projection, matViewMatrix, lightSpaceMatrix);
-	render_scene(fbo2, texture01ID, texture11ID, projection, matViewMatrix, lightSpaceMatrix);
+	render_scene(fbo_render1, texture00ID, texture10ID, projection, matViewMatrix, lightSpaceMatrix1, depthTexture1, lightSpaceMatrix2, depthTexture2);
+	render_scene(fbo_redner2, texture01ID, texture11ID, projection, matViewMatrix, lightSpaceMatrix1, depthTexture1, lightSpaceMatrix2, depthTexture2);
 
 	/*------------------------------------------------------------------------------------------------*/
 
-	blending(projection, matViewMatrix, lightSpaceMatrix);
+	blending(projection, matViewMatrix);
 	
 	/*------------------------------------------------------------------------------------------------*/
 
@@ -700,9 +718,9 @@ void keyboard(unsigned char key, int x, int y) {
 	//special function key
 	case 'z'://move light source to front of camera
 	{
-		light_pos[0] = eyex + cos(eyet*M_PI / 180)*cos(eyep*M_PI / 180);
-		light_pos[1] = eyey + sin(eyet*M_PI / 180);
-		light_pos[2] = eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180);
+		light_pos1[0] = eyex + cos(eyet*M_PI / 180)*cos(eyep*M_PI / 180);
+		light_pos1[1] = eyey + sin(eyet*M_PI / 180);
+		light_pos1[2] = eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180);
 		break;
 	}
 	case 'x'://move ball to front of camera
@@ -714,9 +732,9 @@ void keyboard(unsigned char key, int x, int y) {
 	}
 	case 'c'://reset all pose
 	{
-		light_pos[0] = 1.1;
-		light_pos[1] = 3.5;
-		light_pos[2] = 1.3;
+		light_pos1[0] = 1.1;
+		light_pos1[1] = 3.5;
+		light_pos1[2] = 1.3;
 		ball_pos[0] = 0;
 		ball_pos[1] = -3;
 		ball_pos[2] = 0;
@@ -848,13 +866,13 @@ void camera_light_ball_move()
 			dy = speed;
 		else if (lbackward)
 			dy = -speed;
-		light_pos[0] += dy*cos(eyet*M_PI / 180)*cos(eyep*M_PI / 180) + dx*sin(eyep*M_PI / 180);
-		light_pos[1] += dy*sin(eyet*M_PI / 180);
-		light_pos[2] += dy*(-cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180)) + dx*cos(eyep*M_PI / 180);
+		light_pos1[0] += dy*cos(eyet*M_PI / 180)*cos(eyep*M_PI / 180) + dx*sin(eyep*M_PI / 180);
+		light_pos1[1] += dy*sin(eyet*M_PI / 180);
+		light_pos1[2] += dy*(-cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180)) + dx*cos(eyep*M_PI / 180);
 		if (lup)
-			light_pos[1] += speed;
+			light_pos1[1] += speed;
 		else if(ldown)
-			light_pos[1] -= speed;
+			light_pos1[1] -= speed;
 	}
 	if (bleft || bright || bforward || bbackward || bup || bdown)
 	{
@@ -905,7 +923,7 @@ void draw_light_bulb()
 	quad = gluNewQuadric();
 	glPushMatrix();
 		glColor3f(0.4, 0.5, 0);
-		glTranslatef(light_pos[0], light_pos[1], light_pos[2]);
+		glTranslatef(light_pos1[0], light_pos1[1], light_pos1[2]);
 		gluSphere(quad, light_rad, 40, 20);
 	glPopMatrix();
 }
@@ -1057,7 +1075,7 @@ void print_mat4(char* s, float *m)
 	printf("%s:\n[%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n %f %f %f %f]\n", s, m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
 }
 
-void render_scene(GLuint framebuffer_name, GLuint shadow_image, GLuint hightlight_image, glm::mat4 projection, glm::mat4 viewMatrix, glm:: mat4 lightSpaceMatrix)
+void render_scene(GLuint framebuffer_name, GLuint shadow_image, GLuint hightlight_image, glm::mat4 projection, glm::mat4 viewMatrix, glm::mat4 lightSpaceMatrix1, GLuint depth_texture1, glm::mat4 lightSpaceMatrix2, GLuint depth_texture2)
 {
 	//回復視野範圍
 	glViewport(0, 0, texture_width, texture_height);
@@ -1093,17 +1111,21 @@ void render_scene(GLuint framebuffer_name, GLuint shadow_image, GLuint hightligh
 	//傳入shader屬性
 	glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, &projection[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &viewMatrix[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "lightSpaceMatrix1"), 1, GL_FALSE, &lightSpaceMatrix1[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "lightSpaceMatrix2"), 1, GL_FALSE, &lightSpaceMatrix2[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "ProjectorMatrix"), 1, GL_FALSE, &projectiveTextureMatrix[0][0]);
-	glUniform3fv(glGetUniformLocation(program, "lightPos"), 1, &light_pos[0]);
+	glUniform3fv(glGetUniformLocation(program, "lightPos"), 1, &light_pos1[0]);
 	GLfloat cameraPos[3] = { eyex, eyey, eyez };
 	glUniform3fv(glGetUniformLocation(program, "viewPos"), 1, &cameraPos[0]);
 	glUniform1f(glGetUniformLocation(program, "dissolvingThreshold"), dissolvingThreshold);
 
 	//Loading textures for shader
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, depthTexture);
-	glUniform1i(glGetUniformLocation(program, "shadowMap"), 1);
+	glBindTexture(GL_TEXTURE_2D, depth_texture1);
+	glUniform1i(glGetUniformLocation(program, "shadowMap1"), 1);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, depth_texture2);
+	glUniform1i(glGetUniformLocation(program, "shadowMap2"), 2);
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, shadow_image);
 	glUniform1i(glGetUniformLocation(program, "texture0"), 3);
@@ -1127,7 +1149,7 @@ void render_scene(GLuint framebuffer_name, GLuint shadow_image, GLuint hightligh
 	glViewport(0, 0, screenWidth, screenHeight);
 }
 
-void blending(glm::mat4 projection, glm::mat4 matViewMatrix, glm::mat4 lightSpaceMatrix)
+void blending(glm::mat4 projection, glm::mat4 matViewMatrix)
 {
 	//start blending the result
 	glUseProgram(blending_program);
@@ -1142,7 +1164,6 @@ void blending(glm::mat4 projection, glm::mat4 matViewMatrix, glm::mat4 lightSpac
 	glm::mat4 projectorMatrix = blendingSampleScale * projection * matViewMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(blending_program, "projection"), 1, GL_FALSE, &projection[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(blending_program, "view"), 1, GL_FALSE, &matViewMatrix[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(blending_program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(blending_program, "ProjectorMatrix"), 1, GL_FALSE, &projectorMatrix[0][0]);
 
 	//assigning result 1's texture
@@ -1165,13 +1186,13 @@ void blending(glm::mat4 projection, glm::mat4 matViewMatrix, glm::mat4 lightSpac
 	glUseProgram(0);
 }
 
-void render_depthmap(glm::mat4 lightSpaceMatrix)
+void render_depthmap(GLuint fbo, glm::mat4 lightSpaceMatrix)
 {
 	//設定渲染depth map視野
 	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 
 	//啟動frame buffer
-	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	//清除資料
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -1179,7 +1200,6 @@ void render_depthmap(glm::mat4 lightSpaceMatrix)
 	//使用深度shader
 	glUseProgram(program_depth);
 
-	
 	glUniformMatrix4fv(glGetUniformLocation(program_depth, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
 
 	draw_cube(program_depth);
