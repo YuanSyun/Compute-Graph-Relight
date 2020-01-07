@@ -17,10 +17,9 @@ uniform sampler2D shadowMap2;
 uniform sampler2D texture0;
 uniform sampler2D texture1;
 uniform vec3 lightPos;
-uniform vec3 viewPos;
-uniform float dissolvingThreshold;
-uniform int dissolvingEffects;
-uniform float bias;
+uniform int enableProjectiveTex;
+uniform int enableMultiLight;
+uniform vec3 objectColor;
 
 float ShadowCalculation(sampler2D shadow_texture, vec4 fragPosLightSpace)
 {
@@ -62,15 +61,28 @@ float ShadowCalculation(sampler2D shadow_texture, vec4 fragPosLightSpace)
 }
 
 void main()
-{         
-    // smapling the shadow image and the hightlight image
-	vec3 t0 = texture(texture0, fs_in.ProjTexCoord.xy/fs_in.ProjTexCoord.w).xyz;
-	vec3 t1 = texture(texture1, fs_in.ProjTexCoord.xy/fs_in.ProjTexCoord.w).xyz;
+{   
+	if(enableProjectiveTex == 1)
+	{
+		// smapling the shadow image and the hightlight image
+		vec3 t0 = texture(texture0, fs_in.ProjTexCoord.xy/fs_in.ProjTexCoord.w).xyz;
+		vec3 t1 = texture(texture1, fs_in.ProjTexCoord.xy/fs_in.ProjTexCoord.w).xyz;
 
-    // blending the reulst with shadow value
-    float shadow1 = ShadowCalculation(shadowMap1, fs_in.FragPosLightSpace1);
-	float shadow2 = ShadowCalculation(shadowMap2, fs_in.FragPosLightSpace2);
-	float final_shadow = max(shadow1, shadow2);
-	vec3 lighting = mix(t0, t1, (1.0-final_shadow * 0.5));
-	FragColor = vec4(lighting, 1.0f);
+		// blending the reulst with shadow value
+		float final_shadow;
+		float shadow1 = ShadowCalculation(shadowMap1, fs_in.FragPosLightSpace1);
+		float shadow2 = ShadowCalculation(shadowMap2, fs_in.FragPosLightSpace2);
+		if(enableMultiLight == 1)
+		{
+			final_shadow = max(shadow1, shadow2);
+		}else{
+			final_shadow = shadow1;
+		}
+		vec3 lighting = mix(t0, t1, (1.0-final_shadow * 0.5));
+		FragColor = vec4(lighting, 1.0f);
+	}else
+	{
+		FragColor = vec4(objectColor, 1.0f);
+	}
+    
 }

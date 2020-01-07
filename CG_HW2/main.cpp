@@ -167,6 +167,7 @@ GLuint fbo_depth1, fbo_depth2;
 GLuint depthTexture1, depthTexture2;
 GLfloat now_model_matrix[16];
 glm::mat4 ModelMatrix;
+int enableMultiLight = 0;
 
 // dissolving effect
 GLfloat dissolvingThreshold;
@@ -174,6 +175,7 @@ GLboolean enableDissolving;
 GLint dissolvingEffects = 1;
 
 // projective texture
+int enableProjectiveTexture = 1;
 int texture_width = 1340;
 int texture_height = 1125;
 GLuint texture00ID, texture01ID, texture10ID, texture11ID;
@@ -758,6 +760,26 @@ void keyboard(unsigned char key, int x, int y) {
 		dissolvingEffects = 2;
 		break;
 	}
+	case '0':
+	{
+		enableProjectiveTexture = 0;
+		break;
+	}
+	case '1':
+	{
+		enableProjectiveTexture = 1;
+		break;
+	}
+	case '2':
+	{
+		enableMultiLight = 0;
+		break;
+	}
+	case '3':
+	{
+		enableMultiLight = 1;
+		break;
+	}
 	default:
 	{
 		break;
@@ -1051,7 +1073,6 @@ void keyboardup(unsigned char key, int x, int y)
 		brz = false;
 		break;
 	}
-
 	default:
 	{
 		break;
@@ -1118,6 +1139,10 @@ void render_scene(GLuint framebuffer_name, GLuint shadow_image, GLuint hightligh
 	GLfloat cameraPos[3] = { eyex, eyey, eyez };
 	glUniform3fv(glGetUniformLocation(program, "viewPos"), 1, &cameraPos[0]);
 	glUniform1f(glGetUniformLocation(program, "dissolvingThreshold"), dissolvingThreshold);
+	glUniform1i(glGetUniformLocation(program, "enableProjectiveTex"), enableProjectiveTexture);
+	GLfloat objectColor[3] = { 1.0, 0.0, 0.0 };
+	glUniform3fv(glGetUniformLocation(program, "objectColor"), 1, &objectColor[0]);
+	glUniform1i(glGetUniformLocation(program, "enableMultiLight"), enableMultiLight);
 
 	//Loading textures for shader
 	glActiveTexture(GL_TEXTURE1);
