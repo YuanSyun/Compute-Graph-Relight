@@ -67,7 +67,7 @@ void render_depthmap(GLuint fbo, glm::mat4 lightSpaceMatrix);
 
 namespace
 {
-	char *obj_file_dir = "../Resources/TestCube3.obj";
+	char *obj_file_dir = "../Resources/TestCube7.obj";
 	char *main_tex_dir = "../Resources/Stone.ppm";
 	char *plane_file_dir = "../Resources/plane.obj";
 
@@ -77,8 +77,8 @@ namespace
 	char* tex11_dir = "../Resources/t11.ppm";
 	
 	GLfloat light_rad = 0.05; //radius of the light bulb
-	float eyet = -29.469999; //theta in degree
-	float eyep = 107.699997; //phi in degree
+	float eyet = -27.67; //theta in degree
+	float eyep = 98.699; //phi in degree
 	bool mleft = false;
 	bool mright = false;
 	bool mmiddle = false;
@@ -125,12 +125,12 @@ GLMmodel *model; // TA has already loaded the model for you(!but you still need 
 GLMmodel *planeModel;
 GLMmodel *subModel;
 
-float eyex = 0.983236;
-float eyey = -1.223410;
-float eyez = 5.223782;
+float eyex = 0.973;
+float eyey = 0.785;
+float eyez = 8.83;
 
 GLfloat light_pos1[] = { 1.1, 3.5, 1.3 };
-GLfloat light_pos2[] = { 1.1, 3.5, 1.3 };
+GLfloat light_pos2[] = { 0, 3.5, 1.3 };
 GLfloat ball_pos[] = { 0.0, -3, 0.0 };
 GLfloat ball_rot[] = { 0.0, 0.0, 0.0 };
 GLfloat plane_pos[] = { 0.0, -5.0, 0.0 };
@@ -407,7 +407,7 @@ void init(void)
 
 void display(void)
 {
-	// printf("eye pos: %f, %f, %f, %f, %f\n", eyex, eyey, eyez, eyet, eyep);
+	printf("eye pos: %f, %f, %f, %f, %f\n", eyex, eyey, eyez, eyet, eyep);
 	
 	/*------------------------------------------------------------------------------------------------*/
 	glm::mat4 lightProjection, lightView1, lightView2;
@@ -433,7 +433,7 @@ void display(void)
 	/*------------------------------------------------------------------------------------------------*/
 
 	//取得projection matrix
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (GLfloat)screenWidth / (GLfloat)screenHeight, 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (GLfloat)screenWidth / (GLfloat)screenHeight, 0.1f, 200.0f);
 
 	//調整視野
 	glPushMatrix();
@@ -484,6 +484,7 @@ void draw_plane(GLuint shader_name)
 	glRotatef(plane_rot[0], 1, 0, 0);
 	glRotatef(plane_rot[1], 0, 1, 0);
 	glRotatef(plane_rot[2], 0, 0, 1);
+	glScalef(2.0f, 2.0f, 2.0f);
 	glColor3f(1, 1, 1);
 
 	//取得平面model matrix
@@ -1140,8 +1141,6 @@ void render_scene(GLuint framebuffer_name, GLuint shadow_image, GLuint hightligh
 	glUniform3fv(glGetUniformLocation(program, "viewPos"), 1, &cameraPos[0]);
 	glUniform1f(glGetUniformLocation(program, "dissolvingThreshold"), dissolvingThreshold);
 	glUniform1i(glGetUniformLocation(program, "enableProjectiveTex"), enableProjectiveTexture);
-	GLfloat objectColor[3] = { 1.0, 0.0, 0.0 };
-	glUniform3fv(glGetUniformLocation(program, "objectColor"), 1, &objectColor[0]);
 	glUniform1i(glGetUniformLocation(program, "enableMultiLight"), enableMultiLight);
 
 	//Loading textures for shader
@@ -1158,7 +1157,12 @@ void render_scene(GLuint framebuffer_name, GLuint shadow_image, GLuint hightligh
 	glBindTexture(GL_TEXTURE_2D, hightlight_image);
 	glUniform1i(glGetUniformLocation(program, "texture1"), 4);
 
+	float objectColor1[3] = { 1.0f, 1.0f, 1.0f };
+	glUniform3fv(glGetUniformLocation(program, "objectColor"), 1, &objectColor1[0]);
 	draw_plane(program);
+
+	float objectColor2[3] = { 0.0f, 1.0f, 0.0f };
+	glUniform3fv(glGetUniformLocation(program, "objectColor"), 1, &objectColor2[0]);
 	draw_cube(program);
 
 	//製作frame buffer 結束
